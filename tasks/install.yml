@@ -1,0 +1,29 @@
+---
+
+- name: Create miniforge installer tempfile
+  ansible.builtin.tempfile:
+    prefix: ansible-miniforge-installer.
+    suffix: .sh
+  register: miniforge_installer_tempfile
+
+- name: Collect miniforge installer
+  ansible.builtin.get_url:
+    url: "{{ miniforge_download_url }}"
+    dest: "{{ miniforge_installer_tempfile.path }}"
+    force: true
+    mode: '0755'
+
+- name: Miniforge installer block
+  block:
+
+    - name: Run miniforge installer
+      ansible.builtin.command: "{{ miniforge_installer_shell }} {{ miniforge_installer_tempfile.path }} -b -p {{ miniforge_prefix }}"
+      register: __miniforge_install
+      changed_when: __miniforge_install.rc != 0
+
+  always:
+
+    - name: Remove minicoda installer
+      ansible.builtin.file:
+        path: "{{ miniforge_installer_tempfile.path }}"
+        state: absent

@@ -1,0 +1,7 @@
+---
+- hosts: localhost
+  remote_user: root
+  vars:
+    miniforge_prefix: "{{ lookup('env', 'TRAVIS_BUILD_DIR') }}/conda"
+  roles:
+    - ansible-miniforge
